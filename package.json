@@ -1,0 +1,16 @@
+{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "description": "Task Manager Application",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anshika Agrawal",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^4.1.1",
+    "mongoose": "^6.0.10",
+    "validator": "^13.6.0"
+  }
+}
