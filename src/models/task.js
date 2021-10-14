@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const Task = new mongoose.model('Task', {
-    Description: {
+    description: {
         type: String,
         required: true,
         trim: true,
     },
-    Completed: {
+    completed: {
         type: Boolean,
         default: false,
     }

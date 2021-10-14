@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const User = mongoose.model('User', {
-    Name: {
+    name: {
         type: String,
         required: true,
         trim: true,
     },
-    Email: {
+    email: {
         type: String,
         required: true,
         trim: true,
@@ -18,7 +18,7 @@ const User = mongoose.model('User', {
             }
         }
     },
-    Age: {
+    age: {
         type: Number,
         default: 0,
         validate(value) {
@@ -27,7 +27,7 @@ const User = mongoose.model('User', {
             }
         }
     },
-    Password: {
+    password: {
         type: String,
         required: true,
         trim: true,
