@@ -1,6 +1,21 @@
 const express = require('express');
 const User = require('../models/user');
 const auth = require('../middleware/auth');
+const multer = require('multer');
+
+const upload = multer({
+    dest: 'images',
+    limits: {
+        fileSize: 1000000,
+    },
+    fileFilter(req, file, cb) {
+
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(new Error('Please upload only images.'));
+        }
+        return cb(undefined, true);
+    }
+});
 
 const router = new express.Router();
 
@@ -63,6 +78,12 @@ router.post('/users/logoutAll', auth, async function(req, res) {
     } catch (error) {
         res.status(500).send(error);
     }
+});
+
+router.post('/users/me/avatar', upload.single('avatar'), async function(req, res) {
+    res.send();
+}, function(error, req, res, next) {
+    res.status(400).send({ error: error.message });
 });
 
 // -------------------      this has to be removed later        -------------------------------
