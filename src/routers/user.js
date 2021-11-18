@@ -2,15 +2,16 @@ const express = require('express');
 const User = require('../models/user');
 const auth = require('../middleware/auth');
 const multer = require('multer');
+const sharp = require('sharp');
 
 const upload = multer({
-    dest: 'images',
+    // dest: 'images',
     limits: {
         fileSize: 1000000,
     },
     fileFilter(req, file, cb) {
 
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file.originalname.match(/\.(JPG|jpg|jpeg|png)$/)) {
             return cb(new Error('Please upload only images.'));
         }
         return cb(undefined, true);
@@ -80,8 +81,15 @@ router.post('/users/logoutAll', auth, async function(req, res) {
     }
 });
 
-router.post('/users/me/avatar', upload.single('avatar'), async function(req, res) {
-    res.send();
+
+// "data:image/jpg;base64," -> prepend this to src attribute of img tag to cross check the image
+router.post('/users/me/avatar', auth, upload.single('avatar'), async function(req, res) {
+
+    const buffer = await sharp(req.file.buffer).resize({ width: 500, height: 500 }).png().toBuffer();
+    req.user.avatar = buffer; //binary data of image
+
+    await req.user.save();
+    res.send('Successfully uploaded');
 }, function(error, req, res, next) {
     res.status(400).send({ error: error.message });
 });
@@ -106,6 +114,22 @@ router.get('/users', async function(req, res) {
 
 router.get('/users/me', auth, async function(req, res) {
     res.send(req.user);
+});
+
+router.get('/users/:id/avatar', async function(req, res) {
+
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user || !user.avatar) {
+            throw new Error('Image not found');
+        }
+
+        res.set('Content-Type', 'image/png');
+        res.status(200).send(user.avatar);
+    } catch (error) {
+        res.status(404).send(error);
+    }
 });
 
 
@@ -181,6 +205,12 @@ router.delete('/user/me', auth, async function(req, res) {
     } catch (error) {
         res.status(500).send();
     }
+});
+
+router.delete('/users/me/avatar', auth, async function(req, res) {
+    req.user.avatar = undefined;
+    await req.user.save();
+    res.send();
 });
 
 module.exports = router;
