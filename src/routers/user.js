@@ -3,6 +3,7 @@ const User = require('../models/user');
 const auth = require('../middleware/auth');
 const multer = require('multer');
 const sharp = require('sharp');
+const { sendWelcomeEmail, sendCancellationEmail } = require('../emails/account');
 
 const upload = multer({
     // dest: 'images',
@@ -27,6 +28,8 @@ router.post('/users', async function(req, res) {
     try {
         await user.save();
         const token = await user.generateAuthToken();
+
+        sendWelcomeEmail(user.email, user.name);
 
         res.status(201).send({ user, token });
     } catch (error) {
@@ -103,12 +106,6 @@ router.get('/users', async function(req, res) {
     } catch (error) {
         res.status(500).send();
     }
-
-    // User.find({}).then((response) => {
-    //     res.status(200).send(response);
-    // }).catch((error) => {
-    //     res.status(500).send();
-    // });
 });
 // --------------------------------------------------
 
@@ -132,33 +129,6 @@ router.get('/users/:id/avatar', async function(req, res) {
     }
 });
 
-
-// -------------------      no longer needed        -------------------------------
-// router.get('/user/:id', async function(req, res) {
-
-//     const _id = req.params.id;
-
-//     try {
-//         const user = await User.findById(_id);
-
-//         if (!user) {
-//             res.status(400).send();
-//         }
-//         res.status(200).send(user);
-//     } catch (error) {
-//         res.status(500).send();
-//     }
-
-//     // User.findById(_id).then((response) => {
-//     //     if (!response) {
-//     //         res.status(400).send();
-//     //     }
-//     //     res.status(200).send(response);
-//     // }).catch((error) => {
-//     //     res.status(500).send();
-//     // });
-// });
-
 router.patch('/user/me', auth, async function(req, res) {
 
     const update = Object.keys(req.body);
@@ -168,8 +138,6 @@ router.patch('/user/me', auth, async function(req, res) {
     if (!isValid) {
         return res.status(400).send('error : invalid!');
     }
-
-    // const _id = req.user._id;
 
     try {
 
@@ -200,6 +168,7 @@ router.delete('/user/me', auth, async function(req, res) {
         // }
 
         await req.user.remove(); // works same as above commented code
+        sendCancellationEmail(req.user.email, req.user.name);
 
         res.status(200).send(req.user);
     } catch (error) {
