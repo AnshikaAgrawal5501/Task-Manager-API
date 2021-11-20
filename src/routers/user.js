@@ -2,7 +2,7 @@ const express = require('express');
 const User = require('../models/user');
 const auth = require('../middleware/auth');
 const multer = require('multer');
-const sharp = require('sharp');
+var Jimp = require('jimp');
 const { sendWelcomeEmail, sendCancellationEmail } = require('../emails/account');
 
 const upload = multer({
@@ -88,11 +88,17 @@ router.post('/users/logoutAll', auth, async function(req, res) {
 // "data:image/jpg;base64," -> prepend this to src attribute of img tag to cross check the image
 router.post('/users/me/avatar', auth, upload.single('avatar'), async function(req, res) {
 
-    const buffer = await sharp(req.file.buffer).resize({ width: 500, height: 500 }).png().toBuffer();
-    req.user.avatar = buffer; //binary data of image
-    // req.user.avatar = req.file.buffer;
-    await req.user.save();
-    res.send('Successfully uploaded');
+    const image = await Jimp.read(req.file.buffer);
+
+    await image.resize(500, 500);
+
+    image.getBuffer(Jimp.MIME_PNG, async(err, buffer) => {
+        req.user.avatar = buffer;
+
+        await req.user.save();
+        res.send('Successfully uploaded');
+    });
+
 }, function(error, req, res, next) {
     res.status(400).send({ error: error.message });
 });
