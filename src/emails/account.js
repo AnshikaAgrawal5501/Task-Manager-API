@@ -4,54 +4,38 @@ let testAccount;
 let transporter;
 
 function createAccount() {
-    // Generate test SMTP service account from ethereal.email
-    // Only needed if you don't have a real mail account for testing
-    // testAccount = await nodemailer.createTestAccount();
 
-    // console.log(testAccount)
-
-    // create reusable transporter object using the default SMTP transport
     transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
-        secure: true, // true for 465, false for other ports
+        secure: true,
         auth: {
-            user: process.env.USER_NAME, // generated ethereal user
-            pass: process.env.USER_PASSWORD //generated ethereal password
+            user: process.env.USER_NAME,
+            pass: process.env.USER_PASSWORD
         }
     });
 }
 
-// async..await is not allowed in global scope, must use a wrapper
 async function sendWelcomeEmail(email, name) {
 
     if (!transporter) {
         createAccount();
     }
 
-    // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: '"Fred Foo 👻" <anshikaagrawal5501@gmail.com>', // sender address
-        to: email, // list of receivers
-        subject: "Hello ✔", // Subject line
-        text: "Hello world?", // plain text body
-        html: `<h1>Hello ${name}</h1>`, // html body
+        from: '"Fred Foo 👻" <anshikaagrawal5501@gmail.com>',
+        to: email,
+        subject: "Hello ✔",
+        text: "Hello world?",
+        html: `<h1>Hello ${name}</h1>
+        <img src="cid:unique@nodemailer.com"/>
+        `,
+        attachments: [{
+            filename: 'email_welcome.jpg',
+            path: './public/images/email_welcome.jpg',
+            cid: 'unique@nodemailer.com' //same cid value as in the html img src
+        }]
     });
-
-    // console.log("Message sent: %s", info);
-    // // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-    // // Preview only available when sending through an Ethereal account
-    // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    // // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-    // transporter.verify(function(error, success) {
-    //     if (error) {
-    //         console.log(error);
-    //     } else {
-    //         console.log("Server is ready to take our messages");
-    //     }
-    // });
 }
 
 async function sendCancellationEmail(email, name) {
@@ -60,29 +44,20 @@ async function sendCancellationEmail(email, name) {
         createAccount();
     }
 
-    // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: '"Fred Foo 👻" <anshikaagrawal5501@gmail.com>', // sender address
-        to: email, // list of receivers
-        subject: "Bye ✔", // Subject line
-        text: "Bye world?", // plain text body
-        html: `<h1>Bye ${name}</h1>`, // html body
+        from: '"Fred Foo 👻" <anshikaagrawal5501@gmail.com>',
+        to: email,
+        subject: "Bye ✔",
+        text: "Bye world?",
+        html: `<h1>Bye ${name}</h1>
+        <img src="cid:unique@nodemailer.com"/>
+        `,
+        attachments: [{
+            filename: 'email_welcome.jpg',
+            path: './public/images/email_bye.jpg',
+            cid: 'unique@nodemailer.com' //same cid value as in the html img src
+        }]
     });
-
-    // console.log("Message sent: %s", info);
-    // // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-    // // Preview only available when sending through an Ethereal account
-    // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    // // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-    // transporter.verify(function(error, success) {
-    //     if (error) {
-    //         console.log(error);
-    //     } else {
-    //         console.log("Server is ready to take our messages");
-    //     }
-    // });
 }
 
 module.exports = {
