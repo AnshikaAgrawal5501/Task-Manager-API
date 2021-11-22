@@ -4,16 +4,19 @@
     "description": "Task Manager Application",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node src/index.js",
-        "dev": "env-cmd -f ./config/dev.env nodemon src/index.js"
+        "dev": "env-cmd -f ./config/dev.env nodemon src/index.js",
+        "test": "env-cmd -f ./config/test.env jest --watch --runInBand"
+    },
+    "jest": {
+        "testEnvironment": "node"
     },
     "author": "Anshika Agrawal",
     "license": "ISC",
     "dependencies": {
-        "@mailchimp/mailchimp_marketing": "^3.0.72",
         "bcryptjs": "^2.4.3",
         "express": "^4.17.1",
+        "jest": "^27.3.1",
         "jimp": "^0.16.1",
         "jsonwebtoken": "^8.5.1",
         "mongodb": "^4.1.1",
@@ -23,6 +26,7 @@
         "validator": "^13.6.0"
     },
     "devDependencies": {
-        "env-cmd": "^10.1.0"
+        "env-cmd": "^10.1.0",
+        "supertest": "^6.1.6"
     }
 }

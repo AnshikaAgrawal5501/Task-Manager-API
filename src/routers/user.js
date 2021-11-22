@@ -141,7 +141,7 @@ router.patch('/user/me', auth, async function(req, res) {
     const allowed = ['name', 'age', 'email', 'password'];
     const isValid = update.every((update) => allowed.includes(update));
 
-    if (!isValid) {
+    if (!isValid || (update.includes('password') && req.body.password.includes('password'))) {
         return res.status(400).send('error : invalid!');
     }
 
